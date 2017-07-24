@@ -41,13 +41,15 @@
 */
 //==============================================================================
 #include <math.h>
-#include <alerror\alerror.h>
-#include <alproxies\almotionproxy.h>
-#include <alproxies\almemoryproxy.h>
+#include <alerror/alerror.h>
+#include <alproxies/almotionproxy.h>
+#include <alproxies/almemoryproxy.h>
 #include <alproxies/alrobotpostureproxy.h>
 #include <qi/os.hpp>
 //------------------------------------------------------------------------------
 #include "chai3d.h"
+
+
 //------------------------------------------------------------------------------
 using namespace chai3d;
 using namespace std;
@@ -57,6 +59,7 @@ using namespace std;
 #else
 #include "GLUT/glut.h"
 #endif
+
 
 extern "C" {
 #include "extApi.h"
@@ -214,7 +217,7 @@ int b_handle;
 
 int main(int argc, char* argv[])
 {
-	clientID = simxStart((simxChar*)"192.168.137.56", 19997, true, true, 2000, 5);
+	clientID = simxStart((simxChar*)"192.168.137.42", 19997, true, true, 2000, 5);
 
 
 	if (clientID != -1)
@@ -610,7 +613,7 @@ void updateHaptics()
 	simulationFinished = false;
 
 	// Creating the Motion constructor
-	AL::ALMotionProxy motion("192.168.137.56", 9559);
+	AL::ALMotionProxy motion("192.168.137.42", 9559);
 	motion.wakeUp();
 
 	//Moving hand-effector variables
@@ -1150,3 +1153,4 @@ bool graspBall(std::vector<float> distance, double R, bool attached){
 
 	return attached;
 }
+
