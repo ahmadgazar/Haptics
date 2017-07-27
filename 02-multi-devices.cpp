@@ -1,45 +1,39 @@
-//==============================================================================
 /*
-	Software License Agreement (BSD License)
-	Copyright (c) 2003-2016, CHAI3D.
-	(www.chai3d.org)
-
-	All rights reserved.
-
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions
-	are met:
-
-	* Redistributions of source code must retain the above copyright
-	notice, this list of conditions and the following disclaimer.
-
-	* Redistributions in binary form must reproduce the above
-	copyright notice, this list of conditions and the following
-	disclaimer in the documentation and/or other materials provided
-	with the distribution.
-
-	* Neither the name of CHAI3D nor the names of its contributors may
-	be used to endorse or promote products derived from this software
-	without specific prior written permission.
-
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-	FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-	INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-	BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-	CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-	LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-	ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-
-	\author    <http://www.chai3d.org>
-	\author    Francois Conti
-	\version   3.1.1 $Rev: 1869 $
+Software License Agreement (BSD License)
+Copyright (c) 2003-2016, CHAI3D.
+(www.chai3d.org)
+All rights reserved.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials provided
+with the distribution.
+* Neither the name of CHAI3D nor the names of its contributors may
+be used to endorse or promote products derived from this software
+without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+\author    <http://www.chai3d.org>
+\author    Francois Conti
+\version   3.1.1 $Rev: 1869 $
 */
 //==============================================================================
+#include <fstream>
+#include <string>
 #include <math.h>
 #include <alerror/alerror.h>
 #include <alproxies/almotionproxy.h>
@@ -73,10 +67,10 @@ extern "C" {
 
 // stereo Mode
 /*
-	C_STEREO_DISABLED:            Stereo is disabled
-	C_STEREO_ACTIVE:              Active stereo for OpenGL NVDIA QUADRO cards
-	C_STEREO_PASSIVE_LEFT_RIGHT:  Passive stereo where L/R images are rendered next to each other
-	C_STEREO_PASSIVE_TOP_BOTTOM:  Passive stereo where L/R images are rendered above each other
+C_STEREO_DISABLED:            Stereo is disabled
+C_STEREO_ACTIVE:              Active stereo for OpenGL NVDIA QUADRO cards
+C_STEREO_PASSIVE_LEFT_RIGHT:  Passive stereo where L/R images are rendered next to each other
+C_STEREO_PASSIVE_TOP_BOTTOM:  Passive stereo where L/R images are rendered above each other
 */
 cStereoMode stereoMode = C_STEREO_DISABLED;
 
@@ -200,18 +194,15 @@ int b_handle;
 
 //==============================================================================
 /*
-	DEMO:   02-multi-devices.cpp
-
-	This application illustrates how to program forces, torques and gripper
-	forces on multiple haptic device.
-
-	In this example the application opens an OpenGL window and displays a
-	3D cursor for each device connected to your computer. If the user presses
-	onto the user button (if available on your haptic device), the color of
-	the cursor changes from blue to green.
-
-	This example is very similar to 01-devices, but extends support for multiple
-	haptic devices
+DEMO:   02-multi-devices.cpp
+This application illustrates how to program forces, torques and gripper
+forces on multiple haptic device.
+In this example the application opens an OpenGL window and displays a
+3D cursor for each device connected to your computer. If the user presses
+onto the user button (if available on your haptic device), the color of
+the cursor changes from blue to green.
+This example is very similar to 01-devices, but extends support for multiple
+haptic devices
 */
 //==============================================================================
 
@@ -319,7 +310,7 @@ int main(int argc, char* argv[])
 			cVector3d(0.0, 0.0, 0.0),    // look at position (target)
 			cVector3d(0.0, 0.0, 1.0));   // direction of the (up) vector
 
-// set the near and far clipping planes of the camera
+										 // set the near and far clipping planes of the camera
 		camera->setClippingPlanes(0.01, 10.0);
 
 		// set stereo mode
@@ -648,7 +639,7 @@ void updateHaptics()
 	//	printf("Hand's position is : %f, \t %f, \t %f\n ", hand_position_vrep[0], hand_position_vrep[1], hand_position_vrep[2]);
 
 
-		//motion.move(1.0f, 0.0f, 0.0f);
+	//motion.move(1.0f, 0.0f, 0.0f);
 	std::vector<float> command_pose(6, 0.0f); // Absolute Position
 	std::vector<float> nao_pose(6, 0.0f);
 	std::vector<float> ball_pose(6, 0.0f);
@@ -656,10 +647,10 @@ void updateHaptics()
 	ball_pose[1] = ball_position[1];// -0.131535; //
 	ball_pose[2] = ball_position[2];// 0.00880959;  //
 
-	//// Hello, my name is Alessandra, and I am not a robotcist ! That's why I don't compute force profiles. Grazie. Ciao.
-	//float large_threshold = 0.08;
-	//float medium_threshold = 0.06;
-	//float ball_radius = 0.05;
+									//// Hello, my name is Alessandra, and I am not a robotcist ! That's why I don't compute force profiles. Grazie. Ciao.
+									//float large_threshold = 0.08;
+									//float medium_threshold = 0.06;
+									//float ball_radius = 0.05;
 
 
 	float small_threshold = 0.05;
@@ -672,10 +663,11 @@ void updateHaptics()
 	std::vector <float> distance_t0(2, 10);
 	std::vector <float> distance_t1(2, 0);
 
+	// Initialize the force gains
+	std::vector <float> Kp(2, 0);
 
 
 	// Compute the slopes
-
 	double m = 0.0;
 	std::vector <double> b(2, 0);
 	double delta_x = 0.04;
@@ -684,8 +676,8 @@ void updateHaptics()
 	double R1p = R1 + delta_x;
 	double R2p = R2 - delta_x;
 
-	std::vector <std::string> last_distance_state (2,"outside"); 
-	std::vector <std::string> distance_state(2,"outside");
+	std::vector <std::string> last_distance_state(2, "outside");
+	std::vector <std::string> distance_state(2, "outside");
 
 	std::vector <double> sphere_radius(4, 0);
 	sphere_radius[0] = R1;
@@ -695,13 +687,30 @@ void updateHaptics()
 
 	ComputeSlopesParameters(R1p, R2, delta_x, m, b);
 
+	// Open the text file 
+	std::ofstream SaveFileHaptics("haptics.txt");
+	//SaveFileHaptics.open("haptics.txt",std::ios::in);
+	// Initalizing the data tables
+	
+
+	if (SaveFileHaptics.is_open()) {
+		std::cout << "Log file opened correctly" << std::endl;
+		SaveFileHaptics << "Distance 1" << " , " << "Force 1" << " , " << "Distance 2" << " , " << "Force 2" << "\n";
+		//SaveFileHaptics << std::to_string(static_cast<long double>(distance_t1[0])) << " , " << std::to_string(static_cast<long double>(Kp[0])) << std::to_string(static_cast<long double>(distance_t1[1])) << " , " << std::to_string(static_cast<long double>(Kp[1])) << "\n";
+	}
+	else
+		std::cout << "Error by opening the log file" << std::endl;
+
+	// Samples counter for saving data
+	int count_samples = 1;
+
 	// main haptic simulation loop
 	while (simulationRunning)
 	{
 
+		
 
-		for (int i = 0; i < numHapticDevices; i++)
-		{
+		for (int i = 0; i < numHapticDevices; i++){
 			/////////////////////////////////////////////////////////////////////
 			// READ HAPTIC DEVICE
 			/////////////////////////////////////////////////////////////////////
@@ -769,12 +778,16 @@ void updateHaptics()
 			{
 
 				cout << "Haptics 1" << endl;
+				cout << "x: " << ball_position[0] << "  y: " << ball_position[1] << " zx:" << ball_position[2] << endl;
 				std::string handName = "RHand";
 				motion.openHand(handName);
 
 				command_pose[0] = position.x() * 2;
 				command_pose[1] = position.y() * 2;
 				command_pose[2] = position.z() * 2;
+				/*command_pose[0] = ball_position[0];
+				command_pose[1] = ball_position[1];
+				command_pose[2] = ball_position[2];*/
 				command_pose[3] = 0;
 				command_pose[4] = 0;
 				command_pose[5] = 0;
@@ -812,9 +825,9 @@ void updateHaptics()
 				// Open the right hand
 				motion.closeHand("RHand");
 				/*if (attachball)
-					attachball = false;
+				attachball = false;
 				else
-					attachball = true;*/
+				attachball = true;*/
 				cursor[i]->m_material->setYellowGold();
 			}
 			else if (button1 && i == 1)
@@ -841,7 +854,7 @@ void updateHaptics()
 
 
 			//		simxGetObjectPosition(clientID, h_handle, t_handle, hand_position_vrep, simx_opmode_blocking);
-				//	printf("Hand's position is : %f, \t %f, \t %f\n ", hand_position_vrep[0], hand_position_vrep[1], hand_position_vrep[2]);
+			//	printf("Hand's position is : %f, \t %f, \t %f\n ", hand_position_vrep[0], hand_position_vrep[1], hand_position_vrep[2]);
 			//		printf("Naoqi's position is : %f, \t %f, \t %f\n ", nao_pose[0], nao_pose[1], nao_pose[2]);
 			//		printf("Difference : %f \t %f \t \%f \n", (hand_position_vrep[0] - nao_pose[0]), (hand_position_vrep[1] - nao_pose[1]), (hand_position_vrep[2] - nao_pose[2]));
 
@@ -853,15 +866,15 @@ void updateHaptics()
 			else
 				distance_t1[i] = sqrt(pow((nao_pose_left[0] - ball_pose[0]), 2) + pow((nao_pose_left[1] - ball_pose[1]), 2) + pow((nao_pose_left[2] - ball_pose[2]), 2));
 
-			attachball = graspBall(distance_t1,R2, attachball);
+			attachball = graspBall(distance_t1, R2, attachball);
 
-			double Kp;
+			
 			bool dir = HysteresisDirection(distance_t0[i], distance_t1[i]);
 
 			if (attachball)
-				Kp = fmax;
+				Kp[i] = fmax;
 			else
-				Kp = DoHysteresis(distance_t1[i], dir, last_distance_state[i], distance_state[i], sphere_radius, m, b, i);
+				Kp[i] = DoHysteresis(distance_t1[i], dir, last_distance_state[i], distance_state[i], sphere_radius, m, b, i);
 			distance_t0[i] = distance_t1[i];
 
 			// update global variable for graphic display update
@@ -889,7 +902,7 @@ void updateHaptics()
 			// apply force in the direction of the movement
 			cVector3d ball_pose_3d(ball_pose[0], ball_pose[1], ball_pose[2]);
 
-			cVector3d forceField = Kp * (ball_pose_3d - position);
+			cVector3d forceField = Kp[i] * (ball_pose_3d - position);
 			force.add(forceField);
 
 			// compute angular torque
@@ -957,9 +970,22 @@ void updateHaptics()
 
 		// update frequency counter
 		frequencyCounter.signal(1);
+
+		// Save the data for both haptics
+		//
+		// && 
+		if (SaveFileHaptics.is_open() && count_samples > 10){
+			count_samples = 0;
+			SaveFileHaptics << std::to_string(static_cast<long double>(distance_t1[0])) << " , " << std::to_string(static_cast<long double>(Kp[0])) << " , " << distance_state[0] << " , "<< std::to_string(static_cast<long double>(distance_t1[1])) << " , " << std::to_string(static_cast<long double>(Kp[1])) << " , "<< distance_state[1] << " , "<< attachball <<"\n";
+			//std::cout << "Saving" << std::endl;
+		}
+		count_samples++;
 	}
 
-	// exit haptics thread
+	// Close the data file
+	SaveFileHaptics.close();
+	std::cout << "Closing the text file" << std::endl;
+
 	simulationFinished = true;
 }
 
@@ -1117,7 +1143,7 @@ double DoHysteresis(double distance, bool goInside, std::string &last_state, std
 
 	if (aux_state != state) {
 		last_state = aux_state;
-		cout <<"Haptics: "<< index << "  Force " << f << "  distance  " << distance << "  State: " << state << endl;
+		cout << "Haptics: " << index << "  Force " << f << "  distance  " << distance << "  State: " << state << endl;
 	}
 	return f;
 }
@@ -1131,19 +1157,20 @@ void ComputeSlopesParameters(double R1p, double R2, double delta_x, double &m, s
 	b[0] = -m*R1p;//JUAN-m*R1;
 	b[1] = -m*R2;//JUAN fmax - m*R2;
 
-	//% Creates funtcion 1 (y1) and function 2 (y2)
-	//x = 0:0.01 : 2 * R2;
-	//y1 = m*x + b1;
-	//y2 = m*x + b2;
-	//
-	//xlimit = R2 - fmax / m;
+				 //% Creates funtcion 1 (y1) and function 2 (y2)
+				 //x = 0:0.01 : 2 * R2;
+				 //y1 = m*x + b1;
+				 //y2 = m*x + b2;
+				 //
+				 //xlimit = R2 - fmax / m;
 
 	return;
 }
-bool graspBall(std::vector<float> distance, double R, bool attached){
-	
+bool graspBall(std::vector<float> distance, double R, bool attached) {
+
 	bool prev_attached = attached;
-	if (distance[0] <= R &&  distance[1] <= R)
+	if (distance[0] < R &&  distance[1] < R)
+	//if (distance[0] <= R &&  distance[1] <= R)
 		attached = true;
 	else
 		attached = false;
@@ -1153,4 +1180,3 @@ bool graspBall(std::vector<float> distance, double R, bool attached){
 
 	return attached;
 }
-
