@@ -42,12 +42,12 @@ POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 #include "chai3d.h"
 
-
+#include <boost/assign/std/vector.hpp>
 //------------------------------------------------------------------------------
 using namespace chai3d;
 using namespace std;
 using namespace AL;
-
+using namespace boost::assign;
 //------------------------------------------------------------------------------
 #ifndef MACOSX
 #include "GL/glut.h"
@@ -239,7 +239,6 @@ double dist = 1.0;
 //Remote v-rep api connection variable
 int clientID;
 //Ball Handle for remote v-rep
-int b_handle;
 
 
 
@@ -685,33 +684,56 @@ void updateHaptics()
 	float fractionMaxSpeed = 0.2f;
 	int axisMask = 7;
 
-	//Remote v-rep information
-	simxGetObjectHandle(clientID, "Sphere", &b_handle, simx_opmode_blocking);
-	int h_handle;
-	int t_handle;
-	simxGetObjectHandle(clientID, "imported_part_36_sub", &h_handle, simx_opmode_blocking);
-	simxGetObjectHandle(clientID, "torso_respondable1cyl0", &t_handle, simx_opmode_blocking);
 
-	float hand_position_vrep[3];
+	// Distance variables
+	simxFloat left_distace2ball;
+	simxFloat right_distace2ball;
+
+
+	//Remote v-rep information
+	simxInt b_handle=169;
+	simxInt righth_handle=69;
+	simxInt lefth_handle = 70;
+	simxInt t_handle=53;
+	simxInt lefth_distance_handle = 2020003;
+	simxInt right_distance_handle = 2020002;
+	//int test_handle;
+
+//	//simxGetObjectHandle(clientID, "SphereDummy", &test_handle, simx_opmode_blocking);
+////	simxGetObjectHandle(clientID, "RefSphere", &b_handle, simx_opmode_blocking);
+//	std::cout << "Sphere Handle " << b_handle << std::endl;
+////	simxGetObjectHandle(clientID, "imported_part_36_sub", &h_handle, simx_opmode_blocking);
+////	simxGetObjectHandle(clientID, "imported_part_20_sub", &t_handle, simx_opmode_blocking);
+//	std::cout << "Torso Handle " << t_handle << std::endl;
+
+	float handright_position_vrep[3];
 	float ball_position[3];
 	//float ball_orientation[3];
 
-	//Get position of the ball
-	simxGetObjectPosition(clientID, b_handle, t_handle, ball_position, simx_opmode_blocking);
-	//	simxGetObjectOrientation(clientID, b_handle, h_handle, ball_orientation, simx_opmode_blocking);
+	////Get position of the ball
+	////simxGetObjectPosition(clientID, 169, 53, ball_position, simx_opmode_streaming);
+	simxGetObjectPosition(clientID, b_handle, t_handle, ball_position, simx_opmode_streaming);
+	////simxSetObjectPosition(clientID, 169, 53, ball_position, simx_opmode_blocking);
+	////simxGetObjectPosition(clientID, test_handle, t_handle, ball_position, simx_opmode_blocking);
 
-	printf("Ball's position is : %f, \t %f, \t %f\n ", ball_position[0], ball_position[1], ball_position[2]);
-	float original_ball_position[3];
-	original_ball_position[0] = -0.40315;
-	original_ball_position[1] = 0.2;
-	original_ball_position[2] = 0.23713;
-	//	simxGetObjectPosition(clientID, h_handle, t_handle, hand_position_vrep, simx_opmode_blocking);
-	//	printf("Hand's position is : %f, \t %f, \t %f\n ", hand_position_vrep[0], hand_position_vrep[1], hand_position_vrep[2]);
+	// Initialize the distance variables
+	simxReadDistance(clientID, lefth_distance_handle, &left_distace2ball, simx_opmode_streaming);
+	simxReadDistance(clientID, right_distance_handle, &right_distace2ball, simx_opmode_streaming);
+
+
+	//printf(" Ball23's position is : %f, \t %f, \t %f\n ", ball_position[0], ball_position[1], ball_position[2]);
+	//float original_ball_position[3];
+
+	///*original_ball_position[0] = -0.40315;
+	//original_ball_position[1] = 0.2;
+	//original_ball_position[2] = 0.23713;*/
+	////	simxGetObjectPosition(clientID, h_handle, t_handle, hand_position_vrep, simx_opmode_blocking);
+	////	printf("Hand's position is : %f, \t %f, \t %f\n ", hand_position_vrep[0], hand_position_vrep[1], hand_position_vrep[2]);
 
 
 	//motion.move(1.0f, 0.0f, 0.0f);
 	std::vector<float> command_pose(6, 0.0f); // Absolute Position
-	std::vector<float> nao_pose(6, 0.0f);
+	std::vector<float> nao_pose;//(6, 0.0f);
 	std::vector<float> ball_pose(6, 0.0f);
 	ball_pose[0] = ball_position[0];// 0.179675; //
 	ball_pose[1] = ball_position[1];// -0.131535; //
@@ -739,9 +761,9 @@ void updateHaptics()
 
 	double m = 0.0;
 	std::vector <double> b(2, 0);
-	double delta_x = 0.04;
-	double R1 = 0.15;
-	double R2 = 0.09;
+	double delta_x = 0.02;
+	double R1 = 0.16;//0.15;
+	double R2 = 0.13;//0.09;
 	double R1p = R1 + delta_x;
 	double R2p = R2 - delta_x;
 
@@ -755,20 +777,52 @@ void updateHaptics()
 	sphere_radius[3] = R2p;
 
 	ComputeSlopesParameters(R1p, R2, delta_x, m, b);
-
+	bool on_boundary = false;
 	// main haptic simulation loop
 	while (simulationRunning)
 	{
+		simxGetObjectPosition(clientID, b_handle, t_handle, ball_position, simx_opmode_streaming);
+		ball_pose[0] = ball_position[0];
+		ball_pose[1] = ball_position[1];
+		ball_pose[2] = ball_position[2];
+		//simxGetObjectPosition(clientID, 169, 53, ball_position, simx_opmode_buffer);
+		//printf(" Ball's position is : %f, \t %f, \t %f\n ", ball_position[0], ball_position[1], ball_position[2]);
+
+
 
 
 		for (int i = 0; i < numHapticDevices; i++)
 		{
+
+			if (i==0){
+				simxReadDistance(clientID, right_distance_handle, &right_distace2ball, simx_opmode_streaming);
+				//std::cout << "Distance for the right EE to the ball:  " << right_distace2ball << std::endl;
+				}
+			else{
+				simxReadDistance(clientID, lefth_distance_handle, &left_distace2ball, simx_opmode_streaming);
+				//std::cout << "Distance for the left EE to the ball:  " << left_distace2ball << std::endl;
+				}
+
 			/////////////////////////////////////////////////////////////////////
 			// READ HAPTIC DEVICE
 			/////////////////////////////////////////////////////////////////////
+			//Right hand position naoqi
+			simxGetObjectPosition(clientID, righth_handle, t_handle, handright_position_vrep, simx_opmode_blocking);
 
-			std::vector<float> nao_pose_right = motion->getPosition(chainNameRight, space, true);
+
+
+			std::vector<float> nao_angle_right = motion->getPosition(chainNameRight, space, true);
+			std::vector<float> nao_pose_right;
+			nao_pose_right += handright_position_vrep[0], handright_position_vrep[1], handright_position_vrep[2], nao_angle_right[3], nao_angle_right[4], nao_angle_right[5];
+
+		//	printf("Vrep's position is : %f, \t %f, \t %f\n ", nao_pose_right[0], nao_pose_right[1], nao_pose_right[2]);
+		//	printf("Ball's position is : %f, \t %f, \t %f\n ", ball_pose[0], ball_pose[1], ball_pose[2]);
+
+
+
+		//	std::vector<float> nao_pose_right = motion->getPosition(chainNameRight, space, true);
 			std::vector<float> nao_pose_left = motion->getPosition(chainNameLeft, space, true);
+		
 			// Position of the sphere
 			//cVector3d spherePosition;
 			//spherePosition.set(0.0849656, -0.0505495, 0.0394306);
@@ -781,14 +835,6 @@ void updateHaptics()
 			// read orientation 
 			cMatrix3d rotation;
 			hapticDevice[i]->getRotation(rotation);
-
-			// read gripper position
-			double gripperAngle;
-			hapticDevice[i]->getGripperAngleRad(gripperAngle);
-
-			// read linear velocity 
-			cVector3d linearVelocity;
-			hapticDevice[i]->getLinearVelocity(linearVelocity);
 
 			// read angular velocity
 			cVector3d angularVelocity;
@@ -811,6 +857,14 @@ void updateHaptics()
 			hapticDevice[i]->getUserSwitch(2, button2);
 			hapticDevice[i]->getUserSwitch(3, button3);
 
+			// read gripper position
+			double gripperAngle;
+			hapticDevice[i]->getGripperAngleRad(gripperAngle);
+
+			// read linear velocity 
+			cVector3d linearVelocity;
+			hapticDevice[i]->getLinearVelocity(linearVelocity);
+
 
 			/////////////////////////////////////////////////////////////////////
 			// UPDATE 3D CURSOR MODEL
@@ -830,8 +884,8 @@ void updateHaptics()
 			{
 
 				cout << "Haptics 1" << endl;
-				std::string handName = "RHand";
-				motion->openHand(handName);
+				/*std::string handName = "RHand";
+				motion->openHand(handName);*/
 
 				command_pose[0] = position.x() * 2;
 				command_pose[1] = position.y() * 2;
@@ -843,16 +897,19 @@ void updateHaptics()
 
 				//	float one_shot_check = sqrt(pow((command_pose[0] - ball_pose[0]), 2) + pow((command_pose[1] - ball_pose[1]), 2) + pow((command_pose[2] - ball_pose[2]), 2));
 				//	float comparison_distance = sqrt(pow((nao_pose_right[0] - ball_pose[0]), 2) + pow((nao_pose_right[1] - ball_pose[1]), 2) + pow((nao_pose_right[2] - ball_pose[2]), 2));
-
-				motion->setPosition(chainNameRight, space, command_pose, fractionMaxSpeed, axisMask);
+				//distance_t1[i] = sqrt(pow((nao_pose_right[0] - ball_pose[0]), 2) + pow((nao_pose_right[1] - ball_pose[1]), 2) + pow((nao_pose_right[2] - ball_pose[2]), 2));
+				distance_t1[i] = right_distace2ball;
+				//if (distance_t1[0] > R2p) {
+					motion->setPosition(chainNameRight, space, command_pose, fractionMaxSpeed, axisMask);
+				//}
 				cursor[i]->m_material->setGreenMediumAquamarine();
 			}
 			if (button0 &&  i == 1)
 			{
 
 				cout << "Haptics 2" << endl;
-				std::string handName = "LHand";
-				motion->openHand(handName);
+	/*			std::string handName = "LHand";
+				motion->openHand(handName);*/
 
 				command_pose[0] = position.x() * 2;
 				command_pose[1] = position.y() * 2;
@@ -910,9 +967,34 @@ void updateHaptics()
 			//float current_distance_left = sqrt(pow((nao_pose_left[0] - ball_pose[0]), 2) + pow((nao_pose_left[1] - ball_pose[1]), 2) + pow((nao_pose_left[2] - ball_pose[2]), 2));
 
 			if (i == 0)
-				distance_t1[i] = sqrt(pow((nao_pose_right[0] - ball_pose[0]), 2) + pow((nao_pose_right[1] - ball_pose[1]), 2) + pow((nao_pose_right[2] - ball_pose[2]), 2));
+				//distance_t1[i] = sqrt(pow((nao_pose_right[0] - ball_pose[0]), 2) + pow((nao_pose_right[1] - ball_pose[1]), 2) + pow((nao_pose_right[2] - ball_pose[2]), 2));
+				distance_t1[i] = right_distace2ball;
 			else
-				distance_t1[i] = sqrt(pow((nao_pose_left[0] - ball_pose[0]), 2) + pow((nao_pose_left[1] - ball_pose[1]), 2) + pow((nao_pose_left[2] - ball_pose[2]), 2));
+				//distance_t1[i] = sqrt(pow((nao_pose_left[0] - ball_pose[0]), 2) + pow((nao_pose_left[1] - ball_pose[1]), 2) + pow((nao_pose_left[2] - ball_pose[2]), 2));
+				distance_t1[i] = left_distace2ball;
+
+	//		printf("vREP's position is : %f, \t %f, \t %f\n ", nao_pose_right[0], nao_pose_right[1], nao_pose_right[2]);
+
+			if (distance_t1[i] < R2p) {
+				//cout << "BANG !" << endl;
+			//	if (!on_boundary) {
+					//cout << "DISTANCE RIGHT HAND: " << distance_t1[0] << endl; 
+				//	nao_pose = motion->getPosition(chainNameRight, space, true);
+				//	motion->setPosition(chainNameRight, space, nao_pose, fractionMaxSpeed, axisMask);
+				if (i == 0) {
+					std::string handName = "RHand";
+					motion->openHand(handName);
+				}
+				else {
+					std::string handName = "LHand";
+					motion->openHand(handName);
+				}
+				//	on_boundary = true;
+				//}
+			}
+
+	/*		else
+				cout << "DISTANCE RIGHT HAND: " << distance_t1[0] << endl;*/
 
 			attachball = graspBall(distance_t1, R2, attachball);
 
@@ -1002,18 +1084,18 @@ void updateHaptics()
 			// send computed force, torque, and gripper force to haptic device
 			hapticDevice[i]->setForceAndTorqueAndGripperForce(force, torque, gripperForce);
 
-			if (attachball) {
-				//cout << "attached" << endl;
-				ball_position[0] = 0.05;
-				ball_position[1] = 0.0;
-				ball_position[2] = 0.00;
-				simxSetObjectPosition(clientID, b_handle, h_handle, ball_position, simx_opmode_blocking);
-				//	simxSetObjectOrientation(clientID, b_handle,h_handle, ball_orientation, simx_opmode_blocking);
-			}
-			else {
-				//simxSetObjectPosition(clientID, b_handle, -1, original_ball_position, simx_opmode_blocking);
-				//cout << " not attached" << endl;
-			}
+			//if (attachball) {
+			//	//cout << "attached" << endl;
+			//	ball_position[0] = 0.05;
+			//	ball_position[1] = 0.0;
+			//	ball_position[2] = 0.00;
+			//	simxSetObjectPosition(clientID, b_handle, righth_handle, ball_position, simx_opmode_blocking);
+			//	//	simxSetObjectOrientation(clientID, b_handle,h_handle, ball_orientation, simx_opmode_blocking);
+			//}
+			//else {
+			//	//simxSetObjectPosition(clientID, b_handle, -1, original_ball_position, simx_opmode_blocking);
+			//	//cout << " not attached" << endl;
+			//}
 		}
 
 		// update frequency counter
